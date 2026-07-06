@@ -17,7 +17,7 @@
         },
         "text": {
           "type": "text",
-          "settings": { "text": "<p>Fresh discounts added every week</p>", "text_style": "body" }
+          "settings": { "text": "Fresh discounts added every week", "text_style": "body" }
         }
       },
       "block_order": ["heading", "text"],
