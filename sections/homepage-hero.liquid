@@ -1,0 +1,22 @@
+{% content_for 'blocks' %}
+
+{% schema %}
+{
+  "name": "Homepage hero",
+  "class": "section",
+  "tag": "section",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "blocks": [
+    {
+      "type": "@theme"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Homepage hero"
+    }
+  ]
+}
+{% endschema %}
