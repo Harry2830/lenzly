@@ -228,9 +228,11 @@
           {% else %}
             <div class="ai-slideshow-slide-placeholder-{{ ai_gen_id }}">
               {{ 'hero-apparel-1' | placeholder_svg_tag }}
-              <div class="ai-slideshow-empty-state-{{ ai_gen_id }}">
-                Next, add an image for slide {{ i }}
-              </div>
+              {% if request.design_mode %}
+                <div class="ai-slideshow-empty-state-{{ ai_gen_id }}">
+                  Next, add an image for slide {{ i }}
+                </div>
+              {% endif %}
             </div>
           {% endif %}
 
