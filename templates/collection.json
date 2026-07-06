@@ -9,7 +9,7 @@
       }
     },
     "promo_banner": {
-      "type": "image-banner",
+      "type": "rich-text",
       "blocks": {
         "heading": {
           "type": "heading",
@@ -17,21 +17,17 @@
         },
         "text": {
           "type": "text",
-          "settings": { "text": "Fresh discounts added every week", "text_style": "body" }
+          "settings": { "text": "<p>Fresh discounts added every week</p>" }
         }
       },
       "block_order": ["heading", "text"],
       "settings": {
-        "image_height": "small",
-        "image_overlay_opacity": 0,
-        "image_behavior": "none",
-        "desktop_content_position": "middle-center",
-        "desktop_content_alignment": "center",
-        "show_text_box": true,
+        "desktop_content_position": "center",
+        "content_alignment": "center",
         "color_scheme": "scheme-5",
-        "stack_images_on_mobile": true,
-        "mobile_content_alignment": "center",
-        "show_text_below": true
+        "full_width": true,
+        "padding_top": 40,
+        "padding_bottom": 40
       }
     },
     "product-grid": {

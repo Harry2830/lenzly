@@ -51,7 +51,7 @@
   .ai-slideshow-slide-placeholder-{{ ai_gen_id }} {
     width: 100%;
     height: 100%;
-    background-color: #f4f4f4;
+    background: linear-gradient(135deg, #14213D 0%, #2A3B63 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -93,11 +93,13 @@
     font-size: {{ block.settings.heading_size }}px;
     margin: 0 0 16px;
     font-weight: 700;
+    color: {{ block.settings.text_color }};
   }
 
   .ai-slideshow-subheading-{{ ai_gen_id }} {
     font-size: {{ block.settings.subheading_size }}px;
     margin: 0 0 24px;
+    color: {{ block.settings.text_color }};
   }
 
   .ai-slideshow-button-{{ ai_gen_id }} {
@@ -227,8 +229,8 @@
             >
           {% else %}
             <div class="ai-slideshow-slide-placeholder-{{ ai_gen_id }}">
-              {{ 'hero-apparel-1' | placeholder_svg_tag }}
               {% if request.design_mode %}
+                {{ 'hero-apparel-1' | placeholder_svg_tag }}
                 <div class="ai-slideshow-empty-state-{{ ai_gen_id }}">
                   Next, add an image for slide {{ i }}
                 </div>
