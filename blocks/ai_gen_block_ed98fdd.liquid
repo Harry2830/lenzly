@@ -1,0 +1,622 @@
+{% doc %}
+  @prompt
+    slideshow with 3 slides
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-slideshow-{{ ai_gen_id }} {
+    position: relative;
+    width: {{ block.settings.desktop_width_percent }}%;
+    max-width: 100%;
+    overflow: hidden;
+    display: block;
+  }
+
+  .ai-slideshow-container-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    height: {{ block.settings.slide_height }}px;
+  }
+
+  .ai-slideshow-slides-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  .ai-slideshow-slide-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
+  }
+
+  .ai-slideshow-slide-{{ ai_gen_id }}.active {
+    opacity: 1;
+    visibility: visible;
+    z-index: 1;
+  }
+
+  .ai-slideshow-slide-image-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .ai-slideshow-slide-placeholder-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    background-color: #f4f4f4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .ai-slideshow-slide-placeholder-{{ ai_gen_id }} svg {
+    width: 100%;
+    height: 100%;
+    max-width: 500px;
+    max-height: 500px;
+  }
+
+  .ai-slideshow-empty-state-{{ ai_gen_id }} {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 20px;
+    font-size: 14px;
+    color: #666;
+    text-align: center;
+    pointer-events: none;
+  }
+
+  .ai-slideshow-content-{{ ai_gen_id }} {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: {{ block.settings.text_color }};
+    z-index: 2;
+    width: 90%;
+    max-width: 600px;
+  }
+
+  .ai-slideshow-heading-{{ ai_gen_id }} {
+    font-size: {{ block.settings.heading_size }}px;
+    margin: 0 0 16px;
+    font-weight: 700;
+  }
+
+  .ai-slideshow-subheading-{{ ai_gen_id }} {
+    font-size: {{ block.settings.subheading_size }}px;
+    margin: 0 0 24px;
+  }
+
+  .ai-slideshow-button-{{ ai_gen_id }} {
+    display: inline-block;
+    padding: 12px 32px;
+    background-color: {{ block.settings.button_color }};
+    color: {{ block.settings.button_text_color }};
+    text-decoration: none;
+    border-radius: {{ block.settings.button_radius }}px;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+  }
+
+  .ai-slideshow-button-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.button_hover_color }};
+  }
+
+  .ai-slideshow-controls-{{ ai_gen_id }} {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 3;
+    background: rgba(0, 0, 0, 0.5);
+    border: none;
+    color: #ffffff;
+    width: 48px;
+    height: 48px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease;
+  }
+
+  .ai-slideshow-controls-{{ ai_gen_id }}:hover {
+    background: rgba(0, 0, 0, 0.7);
+  }
+
+  .ai-slideshow-prev-{{ ai_gen_id }} {
+    left: 16px;
+  }
+
+  .ai-slideshow-next-{{ ai_gen_id }} {
+    right: 16px;
+  }
+
+  .ai-slideshow-dots-{{ ai_gen_id }} {
+    position: absolute;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 12px;
+    z-index: 3;
+  }
+
+  .ai-slideshow-dot-{{ ai_gen_id }} {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: background-color 0.3s ease;
+  }
+
+  .ai-slideshow-dot-{{ ai_gen_id }}.active {
+    background: rgba(255, 255, 255, 1);
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-slideshow-container-{{ ai_gen_id }} {
+      height: {{ block.settings.slide_height | times: 0.6 }}px;
+    }
+
+    .ai-slideshow-heading-{{ ai_gen_id }} {
+      font-size: {{ block.settings.heading_size | times: 0.7 }}px;
+    }
+
+    .ai-slideshow-subheading-{{ ai_gen_id }} {
+      font-size: {{ block.settings.subheading_size | times: 0.8 }}px;
+    }
+
+    .ai-slideshow-controls-{{ ai_gen_id }} {
+      width: 40px;
+      height: 40px;
+    }
+
+    .ai-slideshow-prev-{{ ai_gen_id }} {
+      left: 8px;
+    }
+
+    .ai-slideshow-next-{{ ai_gen_id }} {
+      right: 8px;
+    }
+  }
+{% endstyle %}
+
+<slideshow-{{ ai_gen_id }} class="ai-slideshow-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-slideshow-container-{{ ai_gen_id }}">
+    <div class="ai-slideshow-slides-{{ ai_gen_id }}">
+      {% for i in (1..3) %}
+        {% liquid
+          assign image_key = 'slide_' | append: i | append: '_image'
+          assign heading_key = 'slide_' | append: i | append: '_heading'
+          assign subheading_key = 'slide_' | append: i | append: '_subheading'
+          assign button_text_key = 'slide_' | append: i | append: '_button_text'
+          assign button_link_key = 'slide_' | append: i | append: '_button_link'
+
+          assign slide_image = block.settings[image_key]
+          assign slide_heading = block.settings[heading_key]
+          assign slide_subheading = block.settings[subheading_key]
+          assign slide_button_text = block.settings[button_text_key]
+          assign slide_button_link = block.settings[button_link_key]
+        %}
+
+        <div class="ai-slideshow-slide-{{ ai_gen_id }} {% if i == 1 %}active{% endif %}" data-slide="{{ i }}">
+          {% if slide_image %}
+            <img
+              src="{{ slide_image | image_url: width: 2000 }}"
+              alt="{{ slide_image.alt | escape }}"
+              loading="lazy"
+              width="{{ slide_image.width }}"
+              height="{{ slide_image.height }}"
+              class="ai-slideshow-slide-image-{{ ai_gen_id }}"
+            >
+          {% else %}
+            <div class="ai-slideshow-slide-placeholder-{{ ai_gen_id }}">
+              {{ 'hero-apparel-1' | placeholder_svg_tag }}
+              <div class="ai-slideshow-empty-state-{{ ai_gen_id }}">
+                Next, add an image for slide {{ i }}
+              </div>
+            </div>
+          {% endif %}
+
+          {% if slide_heading != blank or slide_subheading != blank or slide_button_text != blank %}
+            <div class="ai-slideshow-content-{{ ai_gen_id }}">
+              {% if slide_heading != blank %}
+                <h2 class="ai-slideshow-heading-{{ ai_gen_id }}">{{ slide_heading }}</h2>
+              {% endif %}
+
+              {% if slide_subheading != blank %}
+                <p class="ai-slideshow-subheading-{{ ai_gen_id }}">{{ slide_subheading }}</p>
+              {% endif %}
+
+              {% if slide_button_text != blank %}
+                <a
+                  href="{{ slide_button_link | default: '#' }}"
+                  class="ai-slideshow-button-{{ ai_gen_id }}"
+                >
+                  {{ slide_button_text }}
+                </a>
+              {% endif %}
+            </div>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+
+    {% if block.settings.show_arrows %}
+      <button
+        class="ai-slideshow-controls-{{ ai_gen_id }} ai-slideshow-prev-{{ ai_gen_id }}"
+        aria-label="Previous slide"
+      >
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+
+      <button
+        class="ai-slideshow-controls-{{ ai_gen_id }} ai-slideshow-next-{{ ai_gen_id }}"
+        aria-label="Next slide"
+      >
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
+    {% endif %}
+
+    {% if block.settings.show_dots %}
+      <div class="ai-slideshow-dots-{{ ai_gen_id }}">
+        {% for i in (1..3) %}
+          <button
+            class="ai-slideshow-dot-{{ ai_gen_id }} {% if i == 1 %}active{% endif %}"
+            data-slide="{{ i }}"
+            aria-label="Go to slide {{ i }}"
+          ></button>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+</slideshow-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class Slideshow{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+        this.currentSlide = 1;
+        this.totalSlides = 3;
+        this.autoplayInterval = null;
+      }
+
+      connectedCallback() {
+        this.slides = this.querySelectorAll('.ai-slideshow-slide-{{ ai_gen_id }}');
+        this.dots = this.querySelectorAll('.ai-slideshow-dot-{{ ai_gen_id }}');
+        this.prevButton = this.querySelector('.ai-slideshow-prev-{{ ai_gen_id }}');
+        this.nextButton = this.querySelector('.ai-slideshow-next-{{ ai_gen_id }}');
+
+        this.setupEventListeners();
+        
+        {% if block.settings.autoplay %}
+          this.startAutoplay();
+        {% endif %}
+      }
+
+      setupEventListeners() {
+        if (this.prevButton) {
+          this.prevButton.addEventListener('click', () => this.previousSlide());
+        }
+
+        if (this.nextButton) {
+          this.nextButton.addEventListener('click', () => this.nextSlide());
+        }
+
+        this.dots.forEach((dot) => {
+          dot.addEventListener('click', (e) => {
+            const slideNumber = parseInt(e.target.dataset.slide);
+            this.goToSlide(slideNumber);
+          });
+        });
+      }
+
+      goToSlide(slideNumber) {
+        this.slides.forEach((slide) => {
+          slide.classList.remove('active');
+        });
+
+        this.dots.forEach((dot) => {
+          dot.classList.remove('active');
+        });
+
+        const targetSlide = this.querySelector(`.ai-slideshow-slide-{{ ai_gen_id }}[data-slide="${slideNumber}"]`);
+        const targetDot = this.querySelector(`.ai-slideshow-dot-{{ ai_gen_id }}[data-slide="${slideNumber}"]`);
+
+        if (targetSlide) {
+          targetSlide.classList.add('active');
+        }
+
+        if (targetDot) {
+          targetDot.classList.add('active');
+        }
+
+        this.currentSlide = slideNumber;
+
+        {% if block.settings.autoplay %}
+          this.resetAutoplay();
+        {% endif %}
+      }
+
+      nextSlide() {
+        const nextSlideNumber = this.currentSlide === this.totalSlides ? 1 : this.currentSlide + 1;
+        this.goToSlide(nextSlideNumber);
+      }
+
+      previousSlide() {
+        const prevSlideNumber = this.currentSlide === 1 ? this.totalSlides : this.currentSlide - 1;
+        this.goToSlide(prevSlideNumber);
+      }
+
+      startAutoplay() {
+        this.autoplayInterval = setInterval(() => {
+          this.nextSlide();
+        }, {{ block.settings.autoplay_speed }} * 1000);
+      }
+
+      resetAutoplay() {
+        if (this.autoplayInterval) {
+          clearInterval(this.autoplayInterval);
+          this.startAutoplay();
+        }
+      }
+
+      disconnectedCallback() {
+        if (this.autoplayInterval) {
+          clearInterval(this.autoplayInterval);
+        }
+      }
+    }
+
+    customElements.define('slideshow-{{ ai_gen_id }}', Slideshow{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Slideshow",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "desktop_width_percent",
+      "label": "Desktop width",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "slide_height",
+      "label": "Slide height",
+      "min": 300,
+      "max": 800,
+      "step": 50,
+      "unit": "px",
+      "default": 500
+    },
+    {
+      "type": "header",
+      "content": "Slide 1"
+    },
+    {
+      "type": "image_picker",
+      "id": "slide_1_image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "slide_1_heading",
+      "label": "Heading",
+      "default": "Welcome to our store"
+    },
+    {
+      "type": "text",
+      "id": "slide_1_subheading",
+      "label": "Subheading",
+      "default": "Discover amazing products"
+    },
+    {
+      "type": "text",
+      "id": "slide_1_button_text",
+      "label": "Button text",
+      "default": "Shop now"
+    },
+    {
+      "type": "url",
+      "id": "slide_1_button_link",
+      "label": "Button link"
+    },
+    {
+      "type": "header",
+      "content": "Slide 2"
+    },
+    {
+      "type": "image_picker",
+      "id": "slide_2_image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "slide_2_heading",
+      "label": "Heading",
+      "default": "New arrivals"
+    },
+    {
+      "type": "text",
+      "id": "slide_2_subheading",
+      "label": "Subheading",
+      "default": "Check out our latest collection"
+    },
+    {
+      "type": "text",
+      "id": "slide_2_button_text",
+      "label": "Button text",
+      "default": "Explore"
+    },
+    {
+      "type": "url",
+      "id": "slide_2_button_link",
+      "label": "Button link"
+    },
+    {
+      "type": "header",
+      "content": "Slide 3"
+    },
+    {
+      "type": "image_picker",
+      "id": "slide_3_image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "slide_3_heading",
+      "label": "Heading",
+      "default": "Special offers"
+    },
+    {
+      "type": "text",
+      "id": "slide_3_subheading",
+      "label": "Subheading",
+      "default": "Save big on selected items"
+    },
+    {
+      "type": "text",
+      "id": "slide_3_button_text",
+      "label": "Button text",
+      "default": "View deals"
+    },
+    {
+      "type": "url",
+      "id": "slide_3_button_link",
+      "label": "Button link"
+    },
+    {
+      "type": "header",
+      "content": "Text style"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "label": "Heading size",
+      "min": 20,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "subheading_size",
+      "label": "Subheading size",
+      "min": 12,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "header",
+      "content": "Button style"
+    },
+    {
+      "type": "color",
+      "id": "button_color",
+      "label": "Background color",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_color",
+      "label": "Hover background color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "button_radius",
+      "label": "Border radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Controls"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrows",
+      "label": "Show navigation arrows",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_dots",
+      "label": "Show navigation dots",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Enable autoplay",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "autoplay_speed",
+      "label": "Autoplay speed",
+      "min": 2,
+      "max": 10,
+      "step": 1,
+      "unit": "s",
+      "default": 5
+    }
+  ],
+  "presets": [
+    {
+      "name": "Slideshow"
+    }
+  ]
+}
+{% endschema %}
